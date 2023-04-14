@@ -5,7 +5,12 @@ namespace Patch
 {
 	struct PatchData
 	{
-		DWORD64 Address;
+		#ifdef WIN32
+			DWORD Address;
+		#else
+			DWORD64 Address;
+		#endif
+		
 		DWORD Length;
 		BYTE* OriginalBytes;
 		BYTE* PatchedBytes;

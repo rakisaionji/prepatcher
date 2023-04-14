@@ -60,7 +60,11 @@ namespace Patch
 				else if (type == "date")
 					Date = value;
 				else if (type == "image_base")
-					ImageBase = _strtoi64(value.c_str(), nullptr, 16);
+					#ifdef WIN32
+						ImageBase = strtol(value.c_str(), nullptr, 16);
+					#else
+						ImageBase = _strtoi64(value.c_str(), nullptr, 16);
+					#endif
 
 				continue;
 			}
@@ -76,7 +80,12 @@ namespace Patch
 			char* buffer;
 			auto patchData = new PatchData();
 
-			patchData->Address = _strtoi64(valueSplit[0].c_str(), &buffer, 16);
+			#ifdef WIN32
+				patchData->Address = strtol(valueSplit[0].c_str(), &buffer, 16);
+			#else
+				patchData->Address = _strtoi64(valueSplit[0].c_str(), &buffer, 16);
+			#endif
+			
 			if (buffer == nullptr)
 				continue;
 	

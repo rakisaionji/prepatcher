@@ -13,7 +13,13 @@ namespace Patch
 		std::string Author;
 		std::string Version;
 		std::string Date;
-		DWORD64 ImageBase;
+		
+		#ifdef WIN32
+			DWORD ImageBase;
+		#else
+			DWORD64 ImageBase;
+		#endif
+		
 		std::vector<PatchData*> PatchDataVector;
 
 		Patch();

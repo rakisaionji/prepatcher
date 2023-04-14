@@ -1,5 +1,11 @@
 #include "Patch/Patcher.h"
 
+#ifdef WIN32
+const DWORD PLATFORM_TYPE = 32;
+#else
+const DWORD PLATFORM_TYPE = 64;
+#endif
+
 const std::string PATCH_FILE_FILE_NAME = "patch.txt";
 const std::string DIVA_PROCESS_NAME = "diva.exe";
 
@@ -38,6 +44,7 @@ bool DoesFileExist(std::string filePath)
 
 int main(int argc, char** argv)
 {
+	printf("main(): Running in %d-bit mode...\n", PLATFORM_TYPE);
 	printf("main(): Checking %s location...\n", PATCH_FILE_FILE_NAME.c_str());
 
 	auto moduleDirectory = GetModuleDirectory();

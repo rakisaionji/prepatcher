@@ -73,7 +73,12 @@ namespace Patch
 
 		for (auto& patchData : patch->PatchDataVector)
 		{
-			printf("Patcher::PatchProgram(): Patching - Address: 0x%016I64X Data: ", patchData->Address);
+			#ifdef WIN32
+				printf("Patcher::PatchProgram(): Patching - Address: 0x%08X Data: ", patchData->Address);
+			#else
+				printf("Patcher::PatchProgram(): Patching - Address: 0x%016I64X Data: ", patchData->Address);
+			#endif
+			
 			for (int i = 0; i < patchData->Length; i++)
 				printf("%02X", patchData->PatchedBytes[i]);
 			printf("\n");
