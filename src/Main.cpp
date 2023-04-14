@@ -6,9 +6,6 @@ const DWORD PLATFORM_TYPE = 32;
 const DWORD PLATFORM_TYPE = 64;
 #endif
 
-const std::string PATCH_FILE_FILE_NAME = "patch.txt";
-const std::string DIVA_PROCESS_NAME = "diva.exe";
-
 int GetDirectorySeperatorPosition(std::string path)
 {
 	for (int i = path.size() - 1; i >= 0; i--)
@@ -21,6 +18,7 @@ int GetDirectorySeperatorPosition(std::string path)
 	return -1;
 }
 
+/*
 std::string GetModuleDirectory()
 {
 	HMODULE module = GetModuleHandleW(NULL);
@@ -35,6 +33,12 @@ std::string GetModuleDirectory()
 
 	return NULL;
 }
+*/
+
+std::string GetFileName(std::string const& path)
+{
+	return path.substr(path.find_last_of("/\\") + 1);
+}
 
 bool DoesFileExist(std::string filePath)
 {
@@ -45,51 +49,59 @@ bool DoesFileExist(std::string filePath)
 int main(int argc, char** argv)
 {
 	printf("main(): Running in %d-bit mode...\n", PLATFORM_TYPE);
-	printf("main(): Checking %s location...\n", PATCH_FILE_FILE_NAME.c_str());
-
-	auto moduleDirectory = GetModuleDirectory();
-	auto patchPath = moduleDirectory + "/" + PATCH_FILE_FILE_NAME;
-
-	if (!DoesFileExist(patchPath))
-	{
-		printf("main(): Unable to locate %s\n", PATCH_FILE_FILE_NAME.c_str());
-		printf("main(): Press enter to exit...");
-		std::cin.get();
-		return EXIT_FAILURE;
-	}
-	else
-	{
-		printf("main(): %s successfully located\n", PATCH_FILE_FILE_NAME.c_str());
-	}
-
-	printf("main(): Checking executable location...\n");
 
 	if (argc < 2)
 	{
 		printf("main(): Insufficient number of arguments supplied\n");
-		printf("main(): Please drag the target %s on top of this executable to apply the patches\n", DIVA_PROCESS_NAME.c_str());
+		printf("main(): Please read the instructions carefully");
 		printf("main(): Press enter to exit...");
 		std::cin.get();
 		return EXIT_FAILURE;
 	}
 
-	std::string executablePath = std::string(argv[1]);
+	// === Param 1: Patch Executable ===
 
-	if (!DoesFileExist(executablePath))
+	auto targetFilePath = std::string(argv[1]);
+	auto targetFileName = GetFileName(targetFilePath);
+
+	printf("main(): Checking target file location...\n");
+
+	if (!DoesFileExist(targetFilePath))
 	{
-		printf("main(): Unable to locate %s\n", executablePath.c_str());
+		printf("main(): Unable to locate %s\n", targetFileName.c_str());
+		printf("main(): Press enter to exit...\n");
+		std::cin.get();
+		return EXIT_FAILURE;
+	}
+	else
+	{
+		printf("main(): %s successfully located\n", targetFileName.c_str());
+	}
+
+	// === Param 2: Patch Definition File ===
+
+	auto patchFilePath = (argc < 3) ? "patch.txt" : std::string(argv[2]);
+	auto patchFileName = GetFileName(patchFilePath);
+
+	printf("main(): Checking patch file location...\n");
+
+	if (!DoesFileExist(patchFilePath))
+	{
+		printf("main(): Unable to locate %s\n", patchFileName.c_str());
 		printf("main(): Press enter to exit...");
 		std::cin.get();
 		return EXIT_FAILURE;
 	}
 	else
 	{
-		printf("main(): %s successfully located\n", executablePath.c_str());
+		printf("main(): %s successfully located\n", patchFileName.c_str());
 	}
 
+	printf("main(): Patching target file %s...\n", targetFileName.c_str());
+
 	Patch::Patcher patcher;
-	patcher.LoadPatchFile(patchPath);
-	patcher.PatchProgram(executablePath);
+	patcher.LoadPatchFile(patchFilePath);
+	patcher.PatchProgram(targetFilePath);
 
 	printf("main(): Press enter to exit...");
 	std::cin.get();
